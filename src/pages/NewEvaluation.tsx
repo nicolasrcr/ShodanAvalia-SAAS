@@ -10,10 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useOfflineEvaluation } from '@/hooks/useOfflineEvaluation';
 import { GRADE_OPTIONS } from '@/types/evaluation';
-import { CheckCircle, XCircle, Save, FileDown } from 'lucide-react';
+import { CheckCircle, XCircle, Save, FileDown, Video, AlertCircle } from 'lucide-react';
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
 import { PracticalSectionScoring, type GroupTechniqueScore } from '@/components/evaluation/PracticalSectionScoring';
+import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
 
 interface EvaluationFields {
   // Teoria
@@ -126,10 +128,10 @@ const practicalFieldCategories: Record<string, string[]> = {
   pratica_ju_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
   pratica_kime_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
   pratica_goshin_jutsu: ['Te-waza', 'Koshi-waza', 'Ashi-waza', 'Kansetsu-waza'],
-  pratica_nage_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_renraku_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_kaeshi_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_katame_waza: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza'],
+  pratica_nage_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_renraku_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_kaeshi_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_katame_waza: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza', 'Shinmeisho-no-waza (Novas Técnicas)'],
 };
 
 interface Candidate {
