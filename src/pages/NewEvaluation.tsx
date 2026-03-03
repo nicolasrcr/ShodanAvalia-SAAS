@@ -273,20 +273,11 @@ export default function NewEvaluation() {
 
   const handleSubmit = async (status: 'pendente' | 'aprovado' | 'reprovado') => {
     if (!selectedCandidate) {
-      toast({
-        title: 'Erro',
-        description: 'Selecione um candidato.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Selecione um candidato.', variant: 'destructive' });
       return;
     }
-
     if (!evaluatorName || !evaluatorGrade) {
-      toast({
-        title: 'Erro',
-        description: 'Preencha os dados do avaliador.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Preencha os dados do avaliador.', variant: 'destructive' });
       return;
     }
 
@@ -313,20 +304,42 @@ export default function NewEvaluation() {
       }
     });
 
-    const { error } = await supabase.from('evaluations').insert([evaluationData as any]);
+    // Verificar conexão — salvar offline se necessário
+    if (!navigator.onLine) {
+      const candidateName = candidates.find(c => c.id === selectedCandidate)?.full_name || 'Candidato';
+      saveOffline({
+        temp_id: crypto.randomUUID(),
+        evaluation_data: evaluationData,
+        candidate_name: candidateName,
+        target_grade: selectedGrade,
+        nota_final: notaFinal,
+        status,
+        created_at: new Date().toISOString(),
+        sync_status: 'pending',
+      });
+      toast({
+        title: 'Avaliação salva localmente',
+        description: 'Será sincronizada automaticamente quando houver conexão.',
+      });
+      navigate('/');
+      setLoading(false);
+      return;
+    }
+
+    const { data: inserted, error } = await supabase
+      .from('evaluations')
+      .insert([evaluationData as any])
+      .select('id')
+      .single();
 
     if (error) {
-      toast({
-        title: 'Erro ao salvar',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } else {
+      toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
+    } else if (inserted) {
+      setSavedEvaluationId(inserted.id);
       toast({
         title: 'Avaliação salva!',
-        description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}.`,
+        description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}. Você pode anexar vídeos agora.`,
       });
-      navigate('/evaluations');
     }
 
     setLoading(false);
