@@ -10,10 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useOfflineEvaluation } from '@/hooks/useOfflineEvaluation';
 import { GRADE_OPTIONS } from '@/types/evaluation';
-import { CheckCircle, XCircle, Save, FileDown } from 'lucide-react';
+import { CheckCircle, XCircle, Save, FileDown, Video, AlertCircle } from 'lucide-react';
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
 import { PracticalSectionScoring, type GroupTechniqueScore } from '@/components/evaluation/PracticalSectionScoring';
+import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
 
 interface EvaluationFields {
   // Teoria
@@ -126,10 +128,10 @@ const practicalFieldCategories: Record<string, string[]> = {
   pratica_ju_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
   pratica_kime_no_kata: ['Te-waza', 'Koshi-waza', 'Ashi-waza'],
   pratica_goshin_jutsu: ['Te-waza', 'Koshi-waza', 'Ashi-waza', 'Kansetsu-waza'],
-  pratica_nage_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_renraku_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_kaeshi_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza'],
-  pratica_katame_waza: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza'],
+  pratica_nage_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_renraku_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_kaeshi_waza: ['Ashi-waza', 'Te-waza', 'Koshi-waza', 'Ma-sutemi-waza', 'Yoko-sutemi-waza', 'Habukareta-waza (Técnicas Excluídas)', 'Shinmeisho-no-waza (Novas Técnicas)'],
+  pratica_katame_waza: ['Osaekomi-waza', 'Shime-waza', 'Kansetsu-waza', 'Shinmeisho-no-waza (Novas Técnicas)'],
 };
 
 interface Candidate {
@@ -142,6 +144,7 @@ export default function NewEvaluation() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { saveOffline } = useOfflineEvaluation();
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState('');
@@ -154,16 +157,24 @@ export default function NewEvaluation() {
   const [fields, setFields] = useState<EvaluationFields>(initialFields);
   const [practicalTechniques, setPracticalTechniques] = useState<Record<string, GroupTechniqueScore[]>>({});
   const [loading, setLoading] = useState(false);
+  const [savedEvaluationId, setSavedEvaluationId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCandidates() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('candidates')
         .select('id, full_name, target_grade')
         .order('full_name');
       
       if (data) {
         setCandidates(data);
+        localStorage.setItem('shodanavalia_candidates_cache', JSON.stringify(data));
+      } else if (error) {
+        // Offline fallback
+        try {
+          const cached = JSON.parse(localStorage.getItem('shodanavalia_candidates_cache') || '[]');
+          setCandidates(cached);
+        } catch { /* ignore */ }
       }
     }
     fetchCandidates();
@@ -262,20 +273,11 @@ export default function NewEvaluation() {
 
   const handleSubmit = async (status: 'pendente' | 'aprovado' | 'reprovado') => {
     if (!selectedCandidate) {
-      toast({
-        title: 'Erro',
-        description: 'Selecione um candidato.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Selecione um candidato.', variant: 'destructive' });
       return;
     }
-
     if (!evaluatorName || !evaluatorGrade) {
-      toast({
-        title: 'Erro',
-        description: 'Preencha os dados do avaliador.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Preencha os dados do avaliador.', variant: 'destructive' });
       return;
     }
 
@@ -302,20 +304,42 @@ export default function NewEvaluation() {
       }
     });
 
-    const { error } = await supabase.from('evaluations').insert([evaluationData as any]);
+    // Verificar conexão — salvar offline se necessário
+    if (!navigator.onLine) {
+      const candidateName = candidates.find(c => c.id === selectedCandidate)?.full_name || 'Candidato';
+      saveOffline({
+        temp_id: crypto.randomUUID(),
+        evaluation_data: evaluationData,
+        candidate_name: candidateName,
+        target_grade: selectedGrade,
+        nota_final: notaFinal,
+        status,
+        created_at: new Date().toISOString(),
+        sync_status: 'pending',
+      });
+      toast({
+        title: 'Avaliação salva localmente',
+        description: 'Será sincronizada automaticamente quando houver conexão.',
+      });
+      navigate('/');
+      setLoading(false);
+      return;
+    }
+
+    const { data: inserted, error } = await supabase
+      .from('evaluations')
+      .insert([evaluationData as any])
+      .select('id')
+      .single();
 
     if (error) {
-      toast({
-        title: 'Erro ao salvar',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } else {
+      toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
+    } else if (inserted) {
+      setSavedEvaluationId(inserted.id);
       toast({
         title: 'Avaliação salva!',
-        description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}.`,
+        description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}. Você pode anexar vídeos agora.`,
       });
-      navigate('/evaluations');
     }
 
     setLoading(false);
@@ -538,32 +562,56 @@ export default function NewEvaluation() {
             </div>
           </CardContent>
 
+          {/* Upload de Vídeos */}
+          <div className="p-6 pt-0">
+            {savedEvaluationId ? (
+              <VideoUploadSection evaluationId={savedEvaluationId} />
+            ) : (
+              <Card className="bg-secondary/30">
+                <CardContent className="p-6 text-center">
+                  <Video className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Salve a avaliação primeiro para poder anexar vídeos de prova
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
           {/* Ações */}
           <div className="border-t p-6 bg-secondary/50 flex flex-col sm:flex-row gap-3 justify-end">
-            <Button 
-              variant="outline"
-              onClick={() => handleSubmit('pendente')}
-              disabled={loading}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Salvar Rascunho
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={() => handleSubmit('reprovado')}
-              disabled={loading}
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Reprovar
-            </Button>
-            <Button 
-              className="bg-success hover:bg-success/90"
-              onClick={() => handleSubmit('aprovado')}
-              disabled={loading}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Aprovar
-            </Button>
+            {savedEvaluationId ? (
+              <Button onClick={() => navigate('/evaluations')}>
+                Ir para Avaliações
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={() => handleSubmit('pendente')}
+                  disabled={loading}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Rascunho
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleSubmit('reprovado')}
+                  disabled={loading}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Reprovar
+                </Button>
+                <Button 
+                  className="bg-success hover:bg-success/90"
+                  onClick={() => handleSubmit('aprovado')}
+                  disabled={loading}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Aprovar
+                </Button>
+              </>
+            )}
           </div>
         </Card>
       </div>

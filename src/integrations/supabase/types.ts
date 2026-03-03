@@ -62,6 +62,53 @@ export type Database = {
         }
         Relationships: []
       }
+      evaluation_videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          evaluation_id: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          mime_type: string
+          uploaded_by: string
+          video_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          evaluation_id: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          mime_type: string
+          uploaded_by: string
+          video_type?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          evaluation_id?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          uploaded_by?: string
+          video_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_videos_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluations: {
         Row: {
           candidate_id: string

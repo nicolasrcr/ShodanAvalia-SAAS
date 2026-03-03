@@ -16,6 +16,7 @@ import {
   FileDown
 } from 'lucide-react';
 import { generateStatsReportPDF } from '@/utils/generateReportsPDF';
+import { PendingSyncPanel } from '@/components/evaluation/PendingSyncPanel';
 import {
   BarChart,
   Bar,
@@ -218,6 +219,8 @@ export default function Dashboard() {
   return (
     <MainLayout>
       <div className="space-y-8 animate-fade-in">
+        {/* Pending Sync Panel */}
+        <PendingSyncPanel />
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>

@@ -170,6 +170,89 @@ export default function ProgramsPage() {
           </div>
         )}
 
+        {/* Extra Gokyō */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-accent/80 to-accent/60 text-white">
+            <CardTitle className="font-display text-2xl">Extra Gokyō</CardTitle>
+            <p className="text-sm text-white/80 mt-1">
+              Técnicas além do Gokyō tradicional, reconhecidas pelo Kodokan
+            </p>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="habukareta" className="border-b">
+                <AccordionTrigger className="px-6 hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-accent" />
+                    <span>Habukareta-waza (Técnicas Excluídas)</span>
+                    <Badge variant="outline" className="ml-2">8 técnicas</Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    8 técnicas excluídas do Gokyō na revisão de 1920. Originalmente pertenciam a diferentes grupos:
+                  </p>
+                  <ul className="space-y-2">
+                    {['Obi-otoshi (Te-waza)', 'Seoi-otoshi (Te-waza)', 'Yama-arashi (Te-waza)', 'Uchi-makikomi (Te-waza)',
+                      'O-soto-otoshi (Ashi-waza)', 'Hikikomi-gaeshi (Ma-sutemi-waza)',
+                      'Daki-wakare (Yoko-sutemi-waza)', 'Tawara-gaeshi (Ma-sutemi-waza)'].map((tech, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{tech}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="shinmeisho">
+                <AccordionTrigger className="px-6 hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-success" />
+                    <span>Shinmeisho-no-waza (Novas Técnicas)</span>
+                    <Badge variant="outline" className="ml-2">45 técnicas</Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Técnicas reconhecidas pelo Kodokan a partir de 1982, divididas em Nage-waza (27) e Katame-waza (18).
+                    Incluem variações de projeções (makikomi, gaeshi), imobilizações, estrangulamentos e chaves articulares
+                    que complementam o Gokyō tradicional.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Nage-waza (27)</h4>
+                      <ul className="space-y-1 text-xs text-muted-foreground">
+                        {['Morote-gari', 'Kuchiki-taoshi', 'Kibisu-gaeshi', 'Uchi-mata-sukashi',
+                          'Ko-uchi-gaeshi', 'Obi-tori-gaeshi', 'Sode-tsurikomi-goshi', 'Ippon-seoi-nage',
+                          'Ko-soto-gake', 'Uchi-mata-gaeshi', 'Harai-goshi-gaeshi', 'Hane-goshi-gaeshi',
+                          'O-soto-gaeshi', 'O-uchi-gaeshi', 'Tsubame-gaeshi', 'Kani-basami',
+                          'O-soto-makikomi', 'Kawazu-gake', 'Harai-makikomi', 'Uchi-mata-makikomi',
+                          'Soto-makikomi', 'Ko-uchi-makikomi', 'Hane-makikomi', 'Sukui-nage',
+                          'Yoko-gake', 'Yoko-guruma', 'Daki-age'].map((t, i) => (
+                          <li key={i}>• {t}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Katame-waza (18)</h4>
+                      <ul className="space-y-1 text-xs text-muted-foreground">
+                        {['Uki-gatame', 'Ura-gatame', 'Ushiro-kesa-gatame', 'Kuzure-kesa-gatame',
+                          'Kuzure-kami-shiho-gatame', 'Do-jime', 'Kata-juji-jime', 'Kataha-jime',
+                          'Katate-jime', 'Ryote-jime', 'Tsukkomi-jime', 'Sankaku-jime',
+                          'Ude-hishigi-ashi-gatame', 'Ude-hishigi-hara-gatame', 'Ude-hishigi-hiza-gatame',
+                          'Ude-hishigi-sankaku-gatame', 'Ude-hishigi-te-gatame', 'Ude-hishigi-waki-gatame'].map((t, i) => (
+                          <li key={i}>• {t}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+
         {/* Info */}
         <Card className="bg-secondary/50">
           <CardContent className="p-6">
