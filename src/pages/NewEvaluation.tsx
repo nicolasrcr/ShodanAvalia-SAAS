@@ -144,6 +144,7 @@ export default function NewEvaluation() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { saveOffline } = useOfflineEvaluation();
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState('');
@@ -156,16 +157,24 @@ export default function NewEvaluation() {
   const [fields, setFields] = useState<EvaluationFields>(initialFields);
   const [practicalTechniques, setPracticalTechniques] = useState<Record<string, GroupTechniqueScore[]>>({});
   const [loading, setLoading] = useState(false);
+  const [savedEvaluationId, setSavedEvaluationId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCandidates() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('candidates')
         .select('id, full_name, target_grade')
         .order('full_name');
       
       if (data) {
         setCandidates(data);
+        localStorage.setItem('shodanavalia_candidates_cache', JSON.stringify(data));
+      } else if (error) {
+        // Offline fallback
+        try {
+          const cached = JSON.parse(localStorage.getItem('shodanavalia_candidates_cache') || '[]');
+          setCandidates(cached);
+        } catch { /* ignore */ }
       }
     }
     fetchCandidates();
