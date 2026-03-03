@@ -16,6 +16,7 @@ import {
   FileDown
 } from 'lucide-react';
 import { generateStatsReportPDF } from '@/utils/generateReportsPDF';
+import { PendingSyncPanel } from '@/components/evaluation/PendingSyncPanel';
 import {
   BarChart,
   Bar,
