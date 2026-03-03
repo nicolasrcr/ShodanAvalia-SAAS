@@ -562,32 +562,56 @@ export default function NewEvaluation() {
             </div>
           </CardContent>
 
+          {/* Upload de Vídeos */}
+          <div className="p-6 pt-0">
+            {savedEvaluationId ? (
+              <VideoUploadSection evaluationId={savedEvaluationId} />
+            ) : (
+              <Card className="bg-secondary/30">
+                <CardContent className="p-6 text-center">
+                  <Video className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Salve a avaliação primeiro para poder anexar vídeos de prova
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
           {/* Ações */}
           <div className="border-t p-6 bg-secondary/50 flex flex-col sm:flex-row gap-3 justify-end">
-            <Button 
-              variant="outline"
-              onClick={() => handleSubmit('pendente')}
-              disabled={loading}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Salvar Rascunho
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={() => handleSubmit('reprovado')}
-              disabled={loading}
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Reprovar
-            </Button>
-            <Button 
-              className="bg-success hover:bg-success/90"
-              onClick={() => handleSubmit('aprovado')}
-              disabled={loading}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Aprovar
-            </Button>
+            {savedEvaluationId ? (
+              <Button onClick={() => navigate('/evaluations')}>
+                Ir para Avaliações
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={() => handleSubmit('pendente')}
+                  disabled={loading}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Rascunho
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleSubmit('reprovado')}
+                  disabled={loading}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Reprovar
+                </Button>
+                <Button 
+                  className="bg-success hover:bg-success/90"
+                  onClick={() => handleSubmit('aprovado')}
+                  disabled={loading}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Aprovar
+                </Button>
+              </>
+            )}
           </div>
         </Card>
       </div>
