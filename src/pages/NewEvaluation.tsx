@@ -341,6 +341,26 @@ export default function NewEvaluation() {
       toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
     } else if (inserted) {
       setSavedEvaluationId(inserted.id);
+
+      // Save panel scores if enabled
+      if (panelEnabled && panelEvaluators.length > 0) {
+        const panelData = panelEvaluators.map(ev => ({
+          evaluation_id: inserted.id,
+          evaluator_number: ev.evaluator_number,
+          evaluator_name: ev.evaluator_name,
+          evaluator_grade: ev.evaluator_grade,
+          nota_teorica_final: ev.nota_teorica_final,
+          nota_pratica_final: ev.nota_pratica_final,
+          nota_final: ev.nota_final,
+          ...Object.fromEntries(
+            Object.entries(ev.scores)
+              .filter(([_, v]) => v !== '')
+              .map(([k, v]) => [k, parseFloat(v as string)])
+          ),
+        }));
+        await supabase.from('evaluation_panel_scores').insert(panelData as any);
+      }
+
       toast({
         title: 'Avaliação salva!',
         description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}. Você pode anexar vídeos agora.`,
