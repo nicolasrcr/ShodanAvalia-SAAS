@@ -552,7 +552,18 @@ export default function NewEvaluation() {
               </div>
             </div>
 
-            {/* Resultado Final */}
+            {/* Banca Multi-Avaliador */}
+            <div className="sumula-section">
+              <PanelScoringSection
+                enabled={panelEnabled}
+                onEnabledChange={setPanelEnabled}
+                evaluators={panelEvaluators}
+                onEvaluatorsChange={setPanelEvaluators}
+                activeFields={gradeFields}
+                fieldLabels={fieldLabels}
+              />
+            </div>
+
             <div className="sumula-section">
               <h3 className="font-display font-semibold text-lg mb-4">Resultado</h3>
               <div className="space-y-3">
