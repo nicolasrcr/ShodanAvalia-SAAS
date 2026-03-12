@@ -161,19 +161,19 @@ export default function Validations() {
         {/* Status Counters */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
-            { key: 'all', label: 'Todas', icon: Filter },
+            { value: 'all', label: 'Todas', icon: Filter, color: '' },
             ...VALIDATION_STATUSES,
           ].map(item => (
             <button
-              key={item.key || (item as any).value}
-              onClick={() => setFilterStatus(item.key || (item as any).value)}
+              key={item.value}
+              onClick={() => setFilterStatus(item.value)}
               className={`p-3 rounded-lg border text-center transition-all ${
-                filterStatus === (item.key || (item as any).value)
+                filterStatus === item.value
                   ? 'border-primary bg-primary/10'
                   : 'border-border bg-secondary/30 hover:bg-secondary/50'
               }`}
             >
-              <p className="text-2xl font-bold">{counts[(item.key || (item as any).value) as keyof typeof counts] || 0}</p>
+              <p className="text-2xl font-bold">{counts[item.value as keyof typeof counts] || 0}</p>
               <p className="text-xs text-muted-foreground">{item.label}</p>
             </button>
           ))}
