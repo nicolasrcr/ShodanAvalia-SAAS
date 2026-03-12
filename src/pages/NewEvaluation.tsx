@@ -289,15 +289,17 @@ export default function NewEvaluation() {
     const evaluationData: Record<string, unknown> = {
       candidate_id: selectedCandidate,
       target_grade: selectedGrade,
-      evaluator_name: evaluatorName,
-      evaluator_grade: evaluatorGrade,
+      evaluator_name: panelEnabled && panelEvaluators.length > 0 ? panelEvaluators.map(e => e.evaluator_name).filter(Boolean).join(', ') : evaluatorName,
+      evaluator_grade: panelEnabled && panelEvaluators.length > 0 ? panelEvaluators[0]?.evaluator_grade || evaluatorGrade : evaluatorGrade,
       location: location || null,
       evaluation_date: evaluationDate,
       observations: observations || null,
-      nota_teorica_final: notaTeorica,
-      nota_pratica_final: notaPratica,
-      nota_final: notaFinal,
+      nota_teorica_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_teorica_final, 0) / (panelEvaluators.length || 1) : notaTeorica,
+      nota_pratica_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_pratica_final, 0) / (panelEvaluators.length || 1) : notaPratica,
+      nota_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_final, 0) / (panelEvaluators.length || 1) : notaFinal,
       status,
+      created_by: user?.id || null,
+      validation_status: 'aguardando',
     };
 
     // Adicionar notas dos campos
