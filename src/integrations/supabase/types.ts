@@ -62,6 +62,107 @@ export type Database = {
         }
         Relationships: []
       }
+      evaluation_panel_scores: {
+        Row: {
+          created_at: string
+          evaluation_id: string
+          evaluator_grade: string
+          evaluator_name: string
+          evaluator_number: number
+          id: string
+          nota_final: number | null
+          nota_pratica_final: number | null
+          nota_teorica_final: number | null
+          pratica_arbitragem: number | null
+          pratica_goshin_jutsu: number | null
+          pratica_ju_no_kata: number | null
+          pratica_kaeshi_waza: number | null
+          pratica_katame_no_kata: number | null
+          pratica_katame_waza: number | null
+          pratica_kime_no_kata: number | null
+          pratica_nage_no_kata: number | null
+          pratica_nage_waza: number | null
+          pratica_pedagogia: number | null
+          pratica_renraku_waza: number | null
+          teoria_arbitragem: number | null
+          teoria_atualidades: number | null
+          teoria_etica: number | null
+          teoria_filosofia: number | null
+          teoria_historico: number | null
+          teoria_kata: number | null
+          teoria_tecnicas: number | null
+          teoria_vocabulario: number | null
+        }
+        Insert: {
+          created_at?: string
+          evaluation_id: string
+          evaluator_grade: string
+          evaluator_name: string
+          evaluator_number: number
+          id?: string
+          nota_final?: number | null
+          nota_pratica_final?: number | null
+          nota_teorica_final?: number | null
+          pratica_arbitragem?: number | null
+          pratica_goshin_jutsu?: number | null
+          pratica_ju_no_kata?: number | null
+          pratica_kaeshi_waza?: number | null
+          pratica_katame_no_kata?: number | null
+          pratica_katame_waza?: number | null
+          pratica_kime_no_kata?: number | null
+          pratica_nage_no_kata?: number | null
+          pratica_nage_waza?: number | null
+          pratica_pedagogia?: number | null
+          pratica_renraku_waza?: number | null
+          teoria_arbitragem?: number | null
+          teoria_atualidades?: number | null
+          teoria_etica?: number | null
+          teoria_filosofia?: number | null
+          teoria_historico?: number | null
+          teoria_kata?: number | null
+          teoria_tecnicas?: number | null
+          teoria_vocabulario?: number | null
+        }
+        Update: {
+          created_at?: string
+          evaluation_id?: string
+          evaluator_grade?: string
+          evaluator_name?: string
+          evaluator_number?: number
+          id?: string
+          nota_final?: number | null
+          nota_pratica_final?: number | null
+          nota_teorica_final?: number | null
+          pratica_arbitragem?: number | null
+          pratica_goshin_jutsu?: number | null
+          pratica_ju_no_kata?: number | null
+          pratica_kaeshi_waza?: number | null
+          pratica_katame_no_kata?: number | null
+          pratica_katame_waza?: number | null
+          pratica_kime_no_kata?: number | null
+          pratica_nage_no_kata?: number | null
+          pratica_nage_waza?: number | null
+          pratica_pedagogia?: number | null
+          pratica_renraku_waza?: number | null
+          teoria_arbitragem?: number | null
+          teoria_atualidades?: number | null
+          teoria_etica?: number | null
+          teoria_filosofia?: number | null
+          teoria_historico?: number | null
+          teoria_kata?: number | null
+          teoria_tecnicas?: number | null
+          teoria_vocabulario?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_panel_scores_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluation_videos: {
         Row: {
           created_at: string
@@ -113,9 +214,11 @@ export type Database = {
         Row: {
           candidate_id: string
           created_at: string
+          created_by: string | null
           evaluation_date: string
           evaluator_grade: string
           evaluator_name: string
+          exam_mode: string
           id: string
           location: string | null
           nota_final: number | null
@@ -144,13 +247,19 @@ export type Database = {
           teoria_tecnicas: number | null
           teoria_vocabulario: number | null
           updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_notes: string | null
+          validation_status: string
         }
         Insert: {
           candidate_id: string
           created_at?: string
+          created_by?: string | null
           evaluation_date?: string
           evaluator_grade: string
           evaluator_name: string
+          exam_mode?: string
           id?: string
           location?: string | null
           nota_final?: number | null
@@ -179,13 +288,19 @@ export type Database = {
           teoria_tecnicas?: number | null
           teoria_vocabulario?: number | null
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+          validation_status?: string
         }
         Update: {
           candidate_id?: string
           created_at?: string
+          created_by?: string | null
           evaluation_date?: string
           evaluator_grade?: string
           evaluator_name?: string
+          exam_mode?: string
           id?: string
           location?: string | null
           nota_final?: number | null
@@ -214,6 +329,10 @@ export type Database = {
           teoria_tecnicas?: number | null
           teoria_vocabulario?: number | null
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+          validation_status?: string
         }
         Relationships: [
           {
