@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Search, CheckCircle, XCircle, Clock, FileDown, Video } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Clock, FileDown, Video, ShieldCheck, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { generateEvaluationsReportPDF } from '@/utils/generateReportsPDF';
-import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
 
 interface EvaluationWithCandidate {
   id: string;
@@ -21,20 +20,28 @@ interface EvaluationWithCandidate {
   nota_final: number | null;
   nota_teorica_final: number | null;
   nota_pratica_final: number | null;
-  status: 'pendente' | 'aprovado' | 'reprovado';
+  status: string;
+  validation_status: string;
   candidates: {
     full_name: string;
     federation: string;
   } | null;
 }
 
+const VALIDATION_BADGES: Record<string, { label: string; className: string }> = {
+  aguardando: { label: 'Aguardando', className: 'bg-warning/10 text-warning border-warning/20' },
+  validada: { label: 'Validada', className: 'bg-success/10 text-success border-success/20' },
+  contestada: { label: 'Contestada', className: 'bg-destructive/10 text-destructive border-destructive/20' },
+  revisao: { label: 'Em Revisão', className: 'bg-primary/10 text-primary border-primary/20' },
+};
+
 export default function EvaluationsPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [evaluations, setEvaluations] = useState<EvaluationWithCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [videoCounts, setVideoCounts] = useState<Record<string, number>>({});
-  const [selectedEvaluation, setSelectedEvaluation] = useState<EvaluationWithCandidate | null>(null);
 
   useEffect(() => {
     fetchEvaluations();
@@ -44,18 +51,10 @@ export default function EvaluationsPage() {
     const { data, error } = await supabase
       .from('evaluations')
       .select(`
-        id,
-        evaluation_date,
-        target_grade,
-        evaluator_name,
-        nota_final,
-        nota_teorica_final,
-        nota_pratica_final,
-        status,
-        candidates (
-          full_name,
-          federation
-        )
+        id, evaluation_date, target_grade, evaluator_name,
+        nota_final, nota_teorica_final, nota_pratica_final,
+        status, validation_status,
+        candidates (full_name, federation)
       `)
       .order('evaluation_date', { ascending: false });
     
@@ -63,7 +62,6 @@ export default function EvaluationsPage() {
       toast({ title: 'Erro ao carregar avaliações', description: error.message, variant: 'destructive' });
     } else {
       setEvaluations(data as EvaluationWithCandidate[] || []);
-      // Fetch video counts
       const { data: videos } = await supabase
         .from('evaluation_videos')
         .select('evaluation_id');
@@ -87,6 +85,16 @@ export default function EvaluationsPage() {
       default:
         return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Pendente</Badge>;
     }
+  };
+
+  const getValidationBadge = (status: string) => {
+    const info = VALIDATION_BADGES[status];
+    if (!info) return null;
+    return (
+      <Badge variant="outline" className={info.className}>
+        <ShieldCheck className="h-3 w-3 mr-1" />{info.label}
+      </Badge>
+    );
   };
 
   const filteredEvaluations = evaluations.filter(e => 
@@ -138,7 +146,7 @@ export default function EvaluationsPage() {
               <Card 
                 key={evaluation.id} 
                 className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedEvaluation(evaluation)}
+                onClick={() => navigate(`/evaluations/${evaluation.id}`)}
               >
                 <CardContent className="p-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -157,7 +165,7 @@ export default function EvaluationsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       {videoCounts[evaluation.id] > 0 && (
                         <Badge variant="outline" className="bg-primary/10 text-primary text-xs">
                           <Video className="h-3 w-3 mr-1" />
@@ -170,12 +178,16 @@ export default function EvaluationsPage() {
                           <p className="text-xl font-bold">{evaluation.nota_final.toFixed(2)}</p>
                         </div>
                       )}
+                      {getValidationBadge(evaluation.validation_status)}
                       {getStatusBadge(evaluation.status)}
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-muted-foreground">
                     <span>Avaliador: {evaluation.evaluator_name}</span>
-                    {evaluation.candidates?.federation && <span>{evaluation.candidates.federation}</span>}
+                    <div className="flex items-center gap-2">
+                      {evaluation.candidates?.federation && <span>{evaluation.candidates.federation}</span>}
+                      <Eye className="h-4 w-4 text-muted-foreground/50" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -183,52 +195,6 @@ export default function EvaluationsPage() {
           )}
         </div>
       </div>
-
-      {/* Evaluation Detail Dialog */}
-      <Dialog open={!!selectedEvaluation} onOpenChange={(open) => !open && setSelectedEvaluation(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          {selectedEvaluation && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="font-display">
-                  {selectedEvaluation.candidates?.full_name} — {selectedEvaluation.target_grade}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Data:</span>
-                    <p className="font-medium">
-                      {format(new Date(selectedEvaluation.evaluation_date), "dd/MM/yyyy", { locale: ptBR })}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Avaliador:</span>
-                    <p className="font-medium">{selectedEvaluation.evaluator_name}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Nota Teórica:</span>
-                    <p className="font-medium">{selectedEvaluation.nota_teorica_final?.toFixed(2) || '-'}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Nota Prática:</span>
-                    <p className="font-medium">{selectedEvaluation.nota_pratica_final?.toFixed(2) || '-'}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Nota Final:</span>
-                    <p className="text-xl font-bold">{selectedEvaluation.nota_final?.toFixed(2) || '-'}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Status:</span>
-                    <div className="mt-1">{getStatusBadge(selectedEvaluation.status)}</div>
-                  </div>
-                </div>
-                <VideoUploadSection evaluationId={selectedEvaluation.id} readOnly />
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </MainLayout>
   );
 }

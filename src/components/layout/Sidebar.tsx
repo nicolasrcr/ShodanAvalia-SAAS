@@ -5,9 +5,11 @@ import {
   FileText, 
   History, 
   BookOpen,
-  LayoutDashboard 
+  LayoutDashboard,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRole } from '@/hooks/useRole';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Painel' },
@@ -18,13 +20,20 @@ const navItems = [
   { href: '/programs', icon: BookOpen, label: 'Programas' },
 ];
 
+const adminItems = [
+  { href: '/validations', icon: ShieldCheck, label: 'Validações' },
+];
+
 export function Sidebar() {
   const location = useLocation();
+  const { isAdmin } = useRole();
+
+  const allItems = isAdmin ? [...navItems, ...adminItems] : navItems;
 
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border min-h-[calc(100vh-73px)]">
       <nav className="p-4 space-y-1">
-        {navItems.map((item) => {
+        {allItems.map((item) => {
           const isActive = location.pathname === item.href;
           
           return (

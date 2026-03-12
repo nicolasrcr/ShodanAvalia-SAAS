@@ -16,6 +16,7 @@ import { CheckCircle, XCircle, Save, FileDown, Video, AlertCircle } from 'lucide
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
 import { PracticalSectionScoring, type GroupTechniqueScore } from '@/components/evaluation/PracticalSectionScoring';
 import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
+import { PanelScoringSection } from '@/components/evaluation/PanelScoringSection';
 
 interface EvaluationFields {
   // Teoria
@@ -158,6 +159,8 @@ export default function NewEvaluation() {
   const [practicalTechniques, setPracticalTechniques] = useState<Record<string, GroupTechniqueScore[]>>({});
   const [loading, setLoading] = useState(false);
   const [savedEvaluationId, setSavedEvaluationId] = useState<string | null>(null);
+  const [panelEnabled, setPanelEnabled] = useState(false);
+  const [panelEvaluators, setPanelEvaluators] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchCandidates() {
@@ -286,15 +289,17 @@ export default function NewEvaluation() {
     const evaluationData: Record<string, unknown> = {
       candidate_id: selectedCandidate,
       target_grade: selectedGrade,
-      evaluator_name: evaluatorName,
-      evaluator_grade: evaluatorGrade,
+      evaluator_name: panelEnabled && panelEvaluators.length > 0 ? panelEvaluators.map(e => e.evaluator_name).filter(Boolean).join(', ') : evaluatorName,
+      evaluator_grade: panelEnabled && panelEvaluators.length > 0 ? panelEvaluators[0]?.evaluator_grade || evaluatorGrade : evaluatorGrade,
       location: location || null,
       evaluation_date: evaluationDate,
       observations: observations || null,
-      nota_teorica_final: notaTeorica,
-      nota_pratica_final: notaPratica,
-      nota_final: notaFinal,
+      nota_teorica_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_teorica_final, 0) / (panelEvaluators.length || 1) : notaTeorica,
+      nota_pratica_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_pratica_final, 0) / (panelEvaluators.length || 1) : notaPratica,
+      nota_final: panelEnabled ? panelEvaluators.reduce((s, e) => s + e.nota_final, 0) / (panelEvaluators.length || 1) : notaFinal,
       status,
+      created_by: user?.id || null,
+      validation_status: 'aguardando',
     };
 
     // Adicionar notas dos campos
@@ -336,6 +341,26 @@ export default function NewEvaluation() {
       toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
     } else if (inserted) {
       setSavedEvaluationId(inserted.id);
+
+      // Save panel scores if enabled
+      if (panelEnabled && panelEvaluators.length > 0) {
+        const panelData = panelEvaluators.map(ev => ({
+          evaluation_id: inserted.id,
+          evaluator_number: ev.evaluator_number,
+          evaluator_name: ev.evaluator_name,
+          evaluator_grade: ev.evaluator_grade,
+          nota_teorica_final: ev.nota_teorica_final,
+          nota_pratica_final: ev.nota_pratica_final,
+          nota_final: ev.nota_final,
+          ...Object.fromEntries(
+            Object.entries(ev.scores)
+              .filter(([_, v]) => v !== '')
+              .map(([k, v]) => [k, parseFloat(v as string)])
+          ),
+        }));
+        await supabase.from('evaluation_panel_scores').insert(panelData as any);
+      }
+
       toast({
         title: 'Avaliação salva!',
         description: `Candidato ${status === 'aprovado' ? 'aprovado' : status === 'reprovado' ? 'reprovado' : 'avaliação pendente'}. Você pode anexar vídeos agora.`,
@@ -527,7 +552,18 @@ export default function NewEvaluation() {
               </div>
             </div>
 
-            {/* Resultado Final */}
+            {/* Banca Multi-Avaliador */}
+            <div className="sumula-section">
+              <PanelScoringSection
+                enabled={panelEnabled}
+                onEnabledChange={setPanelEnabled}
+                evaluators={panelEvaluators}
+                onEvaluatorsChange={setPanelEvaluators}
+                activeFields={gradeFields}
+                fieldLabels={fieldLabels}
+              />
+            </div>
+
             <div className="sumula-section">
               <h3 className="font-display font-semibold text-lg mb-4">Resultado</h3>
               <div className="space-y-3">
