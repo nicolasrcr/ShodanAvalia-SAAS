@@ -16,6 +16,7 @@ import { CheckCircle, XCircle, Save, FileDown, Video, AlertCircle } from 'lucide
 import { generateEvaluationPDF } from '@/utils/generateEvaluationPDF';
 import { PracticalSectionScoring, type GroupTechniqueScore } from '@/components/evaluation/PracticalSectionScoring';
 import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
+import { PanelScoringSection } from '@/components/evaluation/PanelScoringSection';
 
 interface EvaluationFields {
   // Teoria
