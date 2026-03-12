@@ -159,6 +159,8 @@ export default function NewEvaluation() {
   const [practicalTechniques, setPracticalTechniques] = useState<Record<string, GroupTechniqueScore[]>>({});
   const [loading, setLoading] = useState(false);
   const [savedEvaluationId, setSavedEvaluationId] = useState<string | null>(null);
+  const [panelEnabled, setPanelEnabled] = useState(false);
+  const [panelEvaluators, setPanelEvaluators] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchCandidates() {
