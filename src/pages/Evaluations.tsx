@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { translateError } from '@/utils/translateError';
 import { useToast } from '@/hooks/use-toast';
 import { Search, CheckCircle, XCircle, Clock, FileDown, Video, ShieldCheck, Eye } from 'lucide-react';
 import { format } from 'date-fns';
