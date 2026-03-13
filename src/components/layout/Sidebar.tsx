@@ -6,7 +6,8 @@ import {
   History, 
   BookOpen,
   LayoutDashboard,
-  ShieldCheck
+  ShieldCheck,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRole } from '@/hooks/useRole';
@@ -18,6 +19,7 @@ const navItems = [
   { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
   { href: '/history', icon: History, label: 'Histórico' },
   { href: '/programs', icon: BookOpen, label: 'Programas' },
+  { href: '/profile', icon: User, label: 'Meu Perfil' },
 ];
 
 const adminItems = [
