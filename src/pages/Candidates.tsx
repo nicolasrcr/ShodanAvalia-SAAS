@@ -83,7 +83,7 @@ export default function CandidatesPage() {
       if (error) {
         toast({
           title: 'Erro ao atualizar',
-          description: error.message,
+           description: translateError(error.message),
           variant: 'destructive',
         });
       } else {
