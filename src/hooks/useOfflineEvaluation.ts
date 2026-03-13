@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { translateError } from '@/utils/translateError';
 
 const STORAGE_KEY = 'shodanavalia_offline_evaluations';
 
