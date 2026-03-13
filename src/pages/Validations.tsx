@@ -78,7 +78,7 @@ export default function Validations() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro', description: translateError(error.message), variant: 'destructive' });
     } else {
       setEvaluations((data as any[]) || []);
     }
