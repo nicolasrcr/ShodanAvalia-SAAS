@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { translateError } from '@/utils/translateError';
 import { useToast } from '@/hooks/use-toast';
 import { GRADE_OPTIONS, PREVIOUS_GRADES, type Candidate } from '@/types/evaluation';
 import { Plus, Search, Edit, Trash2, FileDown } from 'lucide-react';
