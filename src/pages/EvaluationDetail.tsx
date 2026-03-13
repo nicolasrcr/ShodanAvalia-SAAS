@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { translateError } from '@/utils/translateError';
 import { VideoUploadSection } from '@/components/evaluation/VideoUploadSection';
 import { ArrowLeft, FileDown, CheckCircle, XCircle, Clock, ShieldCheck, Users } from 'lucide-react';
 import { format } from 'date-fns';
