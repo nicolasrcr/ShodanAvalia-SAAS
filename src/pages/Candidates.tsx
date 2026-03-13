@@ -108,7 +108,7 @@ export default function CandidatesPage() {
       if (error) {
         toast({
           title: 'Erro ao cadastrar',
-          description: error.message,
+           description: translateError(error.message),
           variant: 'destructive',
         });
       } else {
