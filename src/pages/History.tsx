@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { translateError } from '@/utils/translateError';
 import { useToast } from '@/hooks/use-toast';
 import { Search, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
@@ -58,7 +59,7 @@ export default function HistoryPage() {
     if (error) {
       toast({
         title: 'Erro ao carregar histórico',
-        description: error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
     } else {

@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { translateError } from '@/utils/translateError';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileSpreadsheet, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import * as XLSX from '@e965/xlsx';
@@ -68,7 +69,7 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
     } catch (error: any) {
       toast({
         title: 'Erro ao processar arquivo',
-        description: error.message || 'Não foi possível ler o arquivo.',
+        description: translateError(error.message) || 'Não foi possível ler o arquivo.',
         variant: 'destructive',
       });
     } finally {
@@ -203,7 +204,7 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
     } catch (error: any) {
       toast({
         title: 'Erro na importação',
-        description: error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
       setStep('preview');

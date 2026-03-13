@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { translateError } from '@/utils/translateError';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,7 @@ export default function AuthPage() {
     if (error) {
       toast({
         title: 'Erro ao entrar',
-        description: error.message === 'Invalid login credentials' ? 'Email ou senha incorretos' : error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
     } else {
@@ -79,8 +80,7 @@ export default function AuthPage() {
     }
     const { error } = await signUp(signupEmail, signupPassword, signupName);
     if (error) {
-      let message = error.message;
-      if (error.message.includes('already registered')) message = 'Este email já está cadastrado.';
+      const message = translateError(error.message);
       toast({ title: 'Erro ao cadastrar', description: message, variant: 'destructive' });
     } else {
       toast({ title: 'Cadastro realizado!', description: 'Verifique seu email para confirmar a conta.' });

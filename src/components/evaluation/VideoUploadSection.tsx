@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { translateError } from '@/utils/translateError';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { Video, Upload, Play, Trash2, AlertCircle } from 'lucide-react';
@@ -118,7 +119,7 @@ export function VideoUploadSection({ evaluationId, readOnly = false }: VideoUplo
       .upload(filePath, selectedFile);
 
     if (uploadError) {
-      toast({ title: 'Erro no upload', description: uploadError.message, variant: 'destructive' });
+      toast({ title: 'Erro no upload', description: translateError(uploadError.message), variant: 'destructive' });
       setUploading(false);
       setUploadProgress(0);
       return;
@@ -138,7 +139,7 @@ export function VideoUploadSection({ evaluationId, readOnly = false }: VideoUplo
     }]);
 
     if (insertError) {
-      toast({ title: 'Erro ao registrar vídeo', description: insertError.message, variant: 'destructive' });
+      toast({ title: 'Erro ao registrar vídeo', description: translateError(insertError.message), variant: 'destructive' });
     } else {
       toast({ title: 'Vídeo enviado com sucesso' });
       setSelectedFile(null);

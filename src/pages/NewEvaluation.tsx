@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { translateError } from '@/utils/translateError';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfflineEvaluation } from '@/hooks/useOfflineEvaluation';
@@ -338,7 +339,7 @@ export default function NewEvaluation() {
       .single();
 
     if (error) {
-      toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao salvar', description: translateError(error.message), variant: 'destructive' });
     } else if (inserted) {
       setSavedEvaluationId(inserted.id);
 

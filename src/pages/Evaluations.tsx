@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { translateError } from '@/utils/translateError';
 import { useToast } from '@/hooks/use-toast';
 import { Search, CheckCircle, XCircle, Clock, FileDown, Video, ShieldCheck, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -59,7 +60,7 @@ export default function EvaluationsPage() {
       .order('evaluation_date', { ascending: false });
     
     if (error) {
-      toast({ title: 'Erro ao carregar avaliações', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao carregar avaliações', description: translateError(error.message), variant: 'destructive' });
     } else {
       setEvaluations(data as EvaluationWithCandidate[] || []);
       const { data: videos } = await supabase
