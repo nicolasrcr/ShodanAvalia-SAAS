@@ -339,7 +339,7 @@ export default function NewEvaluation() {
       .single();
 
     if (error) {
-      toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao salvar', description: translateError(error.message), variant: 'destructive' });
     } else if (inserted) {
       setSavedEvaluationId(inserted.id);
 

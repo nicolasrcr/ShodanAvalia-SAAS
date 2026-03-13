@@ -59,7 +59,7 @@ export default function EvaluationsPage() {
       .order('evaluation_date', { ascending: false });
     
     if (error) {
-      toast({ title: 'Erro ao carregar avaliações', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao carregar avaliações', description: translateError(error.message), variant: 'destructive' });
     } else {
       setEvaluations(data as EvaluationWithCandidate[] || []);
       const { data: videos } = await supabase

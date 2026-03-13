@@ -26,7 +26,7 @@ export default function ProgramsPage() {
     if (error) {
       toast({
         title: 'Erro ao carregar programas',
-        description: error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
     } else {

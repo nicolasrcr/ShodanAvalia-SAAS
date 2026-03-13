@@ -139,7 +139,7 @@ export function VideoUploadSection({ evaluationId, readOnly = false }: VideoUplo
     }]);
 
     if (insertError) {
-      toast({ title: 'Erro ao registrar vídeo', description: insertError.message, variant: 'destructive' });
+      toast({ title: 'Erro ao registrar vídeo', description: translateError(insertError.message), variant: 'destructive' });
     } else {
       toast({ title: 'Vídeo enviado com sucesso' });
       setSelectedFile(null);

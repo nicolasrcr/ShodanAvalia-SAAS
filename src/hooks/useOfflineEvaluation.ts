@@ -68,8 +68,8 @@ export function useOfflineEvaluation() {
 
       if (error) {
         ev.sync_status = 'error';
-        ev.sync_error = error.message;
-        errors.push(`${ev.candidate_name}: ${error.message}`);
+        ev.sync_error = translateError(error.message);
+        errors.push(`${ev.candidate_name}: ${translateError(error.message)}`);
       } else {
         ev.sync_status = 'synced';
         synced++;

@@ -73,7 +73,7 @@ export default function EvaluationDetail() {
     ]);
 
     if (evalRes.error) {
-      toast({ title: 'Erro', description: evalRes.error.message, variant: 'destructive' });
+      toast({ title: 'Erro', description: translateError(evalRes.error.message), variant: 'destructive' });
     } else {
       setEvaluation(evalRes.data);
     }

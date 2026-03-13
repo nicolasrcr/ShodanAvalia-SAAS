@@ -100,7 +100,7 @@ export default function Validations() {
       .eq('id', selectedEval.id);
 
     if (error) {
-      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro', description: translateError(error.message), variant: 'destructive' });
     } else {
       toast({ title: 'Status atualizado', description: `Avaliação marcada como "${newStatus}".` });
       

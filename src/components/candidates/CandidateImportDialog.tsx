@@ -204,7 +204,7 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
     } catch (error: any) {
       toast({
         title: 'Erro na importação',
-        description: error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
       setStep('preview');

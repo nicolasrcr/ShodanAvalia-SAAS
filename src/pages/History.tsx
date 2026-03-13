@@ -58,7 +58,7 @@ export default function HistoryPage() {
     if (error) {
       toast({
         title: 'Erro ao carregar histórico',
-        description: error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
     } else {

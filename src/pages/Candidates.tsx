@@ -163,7 +163,7 @@ export default function CandidatesPage() {
   const handleDelete = async (id: string, name: string) => {
     const { error } = await supabase.from('candidates').delete().eq('id', id);
     if (error) {
-      toast({ title: 'Erro ao excluir', description: error.message, variant: 'destructive' });
+      toast({ title: 'Erro ao excluir', description: translateError(error.message), variant: 'destructive' });
     } else {
       toast({ title: 'Candidato excluído', description: `${name} foi removido com sucesso.` });
       fetchCandidates();
