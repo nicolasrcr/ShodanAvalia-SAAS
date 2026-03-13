@@ -103,7 +103,7 @@ export default function Profile() {
   const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
-    <MainLayout title="Perfil do Avaliador" description="Suas avaliações, estatísticas e desempenho">
+    <MainLayout>
       <div className="space-y-6">
         {/* Profile Header */}
         <Card className="border-primary/20">

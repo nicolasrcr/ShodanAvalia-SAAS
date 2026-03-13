@@ -51,6 +51,7 @@ function AppRoutes() {
       <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
       <Route path="/programs" element={<ProtectedRoute><Programs /></ProtectedRoute>} />
       <Route path="/validations" element={<ProtectedRoute><Validations /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

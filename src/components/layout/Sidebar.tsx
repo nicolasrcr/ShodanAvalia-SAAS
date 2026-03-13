@@ -18,6 +18,7 @@ const navItems = [
   { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
   { href: '/history', icon: History, label: 'Histórico' },
   { href: '/programs', icon: BookOpen, label: 'Programas' },
+  { href: '/profile', icon: User, label: 'Meu Perfil' },
 ];
 
 const adminItems = [
