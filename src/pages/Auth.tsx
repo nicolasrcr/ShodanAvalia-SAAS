@@ -49,7 +49,7 @@ export default function AuthPage() {
     if (error) {
       toast({
         title: 'Erro ao entrar',
-        description: error.message === 'Invalid login credentials' ? 'Email ou senha incorretos' : error.message,
+        description: translateError(error.message),
         variant: 'destructive',
       });
     } else {
