@@ -13,6 +13,7 @@ import EvaluationDetail from "./pages/EvaluationDetail";
 import History from "./pages/History";
 import Programs from "./pages/Programs";
 import Validations from "./pages/Validations";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
