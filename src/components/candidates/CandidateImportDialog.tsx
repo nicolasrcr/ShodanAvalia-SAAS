@@ -69,7 +69,7 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
     } catch (error: any) {
       toast({
         title: 'Erro ao processar arquivo',
-        description: error.message || 'Não foi possível ler o arquivo.',
+        description: translateError(error.message) || 'Não foi possível ler o arquivo.',
         variant: 'destructive',
       });
     } finally {
