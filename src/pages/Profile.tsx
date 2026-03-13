@@ -9,8 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { 
-  User, CheckCircle, XCircle, Clock, TrendingUp, 
-  Award, BarChart3, Calendar, Target, FileText 
+  CheckCircle, XCircle, Clock, TrendingUp, 
+  BarChart3, Target, FileText 
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
