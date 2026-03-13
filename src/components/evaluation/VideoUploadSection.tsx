@@ -119,7 +119,7 @@ export function VideoUploadSection({ evaluationId, readOnly = false }: VideoUplo
       .upload(filePath, selectedFile);
 
     if (uploadError) {
-      toast({ title: 'Erro no upload', description: uploadError.message, variant: 'destructive' });
+      toast({ title: 'Erro no upload', description: translateError(uploadError.message), variant: 'destructive' });
       setUploading(false);
       setUploadProgress(0);
       return;
