@@ -6,7 +6,8 @@ import {
   History, 
   BookOpen,
   LayoutDashboard,
-  ShieldCheck
+  ShieldCheck,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRole } from '@/hooks/useRole';
