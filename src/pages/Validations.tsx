@@ -102,6 +102,16 @@ export default function Validations() {
       toast({ title: 'Erro', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Status atualizado', description: `Avaliação marcada como "${newStatus}".` });
+      
+      // Send notification
+      try {
+        await supabase.functions.invoke('notify-validation', {
+          body: { evaluation_id: selectedEval.id, new_status: newStatus, validation_notes: actionNotes || null },
+        });
+      } catch (notifyErr) {
+        console.error('Notification error:', notifyErr);
+      }
+      
       setSelectedEval(null);
       setActionNotes('');
       fetchEvaluations();
