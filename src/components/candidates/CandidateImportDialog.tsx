@@ -168,6 +168,14 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
       throw new Error('Não foi possível extrair texto do documento. Tente usar um arquivo Excel ou CSV.');
     }
 
+    // Truncate and sanitize text before sending
+    const MAX_TEXT_LENGTH = 50000;
+    if (text.length > MAX_TEXT_LENGTH) {
+      text = text.substring(0, MAX_TEXT_LENGTH);
+    }
+    text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+    text = text.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '');
+
     const { data, error } = await supabase.functions.invoke('parse-candidates', {
       body: { text, fileName: file.name },
     });
