@@ -166,7 +166,7 @@ export default function Dashboard() {
         setMonthlyData(monthlyDataArray);
 
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        // Error handled silently in production
       } finally {
         setLoading(false);
       }

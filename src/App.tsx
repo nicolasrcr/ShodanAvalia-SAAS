@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { useRole } from "@/hooks/useRole";
 import AuthPage from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Candidates from "./pages/Candidates";
@@ -18,23 +19,38 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/auth" replace />;
   
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
+  return <>{children}</>;
+}
+
+function RoleProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole: 'admin' | 'moderator' }) {
+  const { user, loading } = useAuth();
+  const { role, loading: roleLoading } = useRole();
+  
+  if (loading || roleLoading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/auth" replace />;
+  
+  const hasAccess = requiredRole === 'moderator'
+    ? (role === 'admin' || role === 'moderator')
+    : role === requiredRole;
+  
+  if (!hasAccess) return <Navigate to="/" replace />;
   
   return <>{children}</>;
 }
@@ -50,7 +66,7 @@ function AppRoutes() {
       <Route path="/new-evaluation" element={<ProtectedRoute><NewEvaluation /></ProtectedRoute>} />
       <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
       <Route path="/programs" element={<ProtectedRoute><Programs /></ProtectedRoute>} />
-      <Route path="/validations" element={<ProtectedRoute><Validations /></ProtectedRoute>} />
+      <Route path="/validations" element={<RoleProtectedRoute requiredRole="admin"><Validations /></RoleProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>

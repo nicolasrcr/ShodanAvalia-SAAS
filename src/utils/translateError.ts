@@ -36,16 +36,18 @@ function logUntranslatedError(message: string, result: string): void {
     untranslatedErrors.add(message);
     logCounter++;
 
-    // Console warning with metadata
-    console.warn(
-      `${LOGGING_CONFIG.prefix} Untranslated error #${logCounter}:`,
-      {
-        original: message,
-        result: result,
-        type: wasWrapped ? 'wrapped_english' : 'unknown_format',
-        timestamp: new Date().toISOString(),
-      }
-    );
+    // Console warning with metadata (dev only)
+    if (import.meta.env.DEV) {
+      console.warn(
+        `${LOGGING_CONFIG.prefix} Untranslated error #${logCounter}:`,
+        {
+          original: message,
+          result: result,
+          type: wasWrapped ? 'wrapped_english' : 'unknown_format',
+          timestamp: new Date().toISOString(),
+        }
+      );
+    }
 
     // Could send to analytics backend here
     if (LOGGING_CONFIG.sendToBackend) {
