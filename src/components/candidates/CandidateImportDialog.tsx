@@ -45,6 +45,18 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file size (5MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: 'Arquivo muito grande',
+        description: 'O arquivo deve ter no máximo 5MB.',
+        variant: 'destructive',
+      });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     setFileName(file.name);
     setLoading(true);
 
