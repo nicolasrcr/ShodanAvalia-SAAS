@@ -76,6 +76,58 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'non-2xx response': 'O servidor retornou um erro.',
 };
 
+// Generic English-to-Portuguese fallback patterns
+const GENERIC_PATTERNS: [RegExp, string][] = [
+  [/^cannot\s+(.+)/i, 'Não foi possível $1.'],
+  [/^could not\s+(.+)/i, 'Não foi possível $1.'],
+  [/^unable to\s+(.+)/i, 'Não foi possível $1.'],
+  [/^failed to\s+(.+)/i, 'Falha ao $1.'],
+  [/^error\s+(.+)/i, 'Erro: $1.'],
+  [/^invalid\s+(.+)/i, 'Inválido: $1.'],
+  [/^missing\s+(.+)/i, 'Ausente: $1.'],
+  [/^unexpected\s+(.+)/i, 'Inesperado: $1.'],
+  [/^access denied/i, 'Acesso negado.'],
+  [/^unauthorized/i, 'Não autorizado. Faça login novamente.'],
+  [/^forbidden/i, 'Acesso proibido.'],
+  [/^conflict/i, 'Conflito: o registro já existe ou foi alterado.'],
+  [/^timeout/i, 'Tempo esgotado. Tente novamente.'],
+  [/^too many/i, 'Muitas tentativas. Aguarde e tente novamente.'],
+  [/^no (.+) found/i, 'Nenhum(a) $1 encontrado(a).'],
+  [/^(.+) is required/i, 'O campo $1 é obrigatório.'],
+  [/^(.+) must be/i, '$1 deve ser válido.'],
+  [/^(.+) already exists/i, '$1 já existe no sistema.'],
+  [/^(.+) not found/i, '$1 não encontrado(a).'],
+  [/^(.+) has expired/i, '$1 expirou.'],
+  [/^(.+) is not allowed/i, '$1 não é permitido.'],
+  [/^(.+) is too (short|long|large|small)/i, '$1 é muito $2.'],
+];
+
+const SIZE_WORDS: Record<string, string> = {
+  short: 'curto',
+  long: 'longo',
+  large: 'grande',
+  small: 'pequeno',
+};
+
+function applyGenericFallback(message: string): string | null {
+  for (const [pattern, template] of GENERIC_PATTERNS) {
+    const match = message.match(pattern);
+    if (match) {
+      let result = template;
+      for (let i = 1; i < match.length; i++) {
+        let replacement = match[i];
+        // Translate common size words
+        if (SIZE_WORDS[replacement.toLowerCase()]) {
+          replacement = SIZE_WORDS[replacement.toLowerCase()];
+        }
+        result = result.replace(`$${i}`, replacement);
+      }
+      return result;
+    }
+  }
+  return null;
+}
+
 export function translateError(message: string): string {
   if (!message) return 'Erro desconhecido.';
 
@@ -91,6 +143,16 @@ export function translateError(message: string): string {
     }
   }
 
-  // Return original if no translation found
+  // Generic pattern fallback
+  const fallback = applyGenericFallback(message);
+  if (fallback) return fallback;
+
+  // If message looks like English (has common English words), wrap it
+  const englishIndicators = /\b(the|is|are|was|were|has|have|not|for|with|this|that|from|your|can|will|should|must|error|failed|invalid|unable|cannot)\b/i;
+  if (englishIndicators.test(message)) {
+    return `Erro: ${message}`;
+  }
+
+  // Return original (likely already in Portuguese)
   return message;
 }
