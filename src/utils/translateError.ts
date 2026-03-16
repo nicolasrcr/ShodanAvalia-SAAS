@@ -1,3 +1,96 @@
+// Store for untranslated errors (in-memory, could be persisted to backend)
+const untranslatedErrors: Set<string> = new Set();
+let logCounter = 0;
+
+// Configure logging (could be extended to send to analytics service)
+const LOGGING_CONFIG = {
+  enabled: true,
+  maxStored: 100,
+  prefix: '[Translation]',
+  sendToBackend: false, // Set to true to enable backend logging
+};
+
+/**
+ * Logs an untranslated error message for later review
+ * Helps identify which messages need manual translation
+ */
+function logUntranslatedError(message: string, result: string): void {
+  if (!LOGGING_CONFIG.enabled) return;
+
+  // Only log if it wasn't directly translated
+  const wasDirectlyTranslated = ERROR_TRANSLATIONS[message] !== undefined;
+  const wasPartialMatch = Object.keys(ERROR_TRANSLATIONS).some(key =>
+    message.toLowerCase().includes(key.toLowerCase())
+  );
+  const wasGenericFallback = applyGenericFallback(message) !== null;
+
+  // Skip if it was translated by any method other than English indicator wrapping
+  if (wasDirectlyTranslated || wasPartialMatch || wasGenericFallback) return;
+
+  // Check if it's an English message that got wrapped
+  const englishIndicators = /\b(the|is|are|was|were|has|have|not|for|with|this|that|from|your|can|will|should|must|error|failed|invalid|unable|cannot)\b/i;
+  const wasWrapped = englishIndicators.test(message);
+
+  // Store for analysis
+  if (!untranslatedErrors.has(message)) {
+    untranslatedErrors.add(message);
+    logCounter++;
+
+    // Console warning with metadata
+    console.warn(
+      `${LOGGING_CONFIG.prefix} Untranslated error #${logCounter}:`,
+      {
+        original: message,
+        result: result,
+        type: wasWrapped ? 'wrapped_english' : 'unknown_format',
+        timestamp: new Date().toISOString(),
+      }
+    );
+
+    // Could send to analytics backend here
+    if (LOGGING_CONFIG.sendToBackend) {
+      // sendToAnalytics({ message, result, timestamp: Date.now() });
+    }
+
+    // Keep set size manageable
+    if (untranslatedErrors.size > LOGGING_CONFIG.maxStored) {
+      const firstItem = untranslatedErrors.values().next().value;
+      untranslatedErrors.delete(firstItem);
+    }
+  }
+}
+
+/**
+ * Get all untranslated errors for review
+ * Useful for finding which messages need to be added to the dictionary
+ */
+export function getUntranslatedErrors(): string[] {
+  return Array.from(untranslatedErrors);
+}
+
+/**
+ * Get statistics about translations
+ */
+export function getTranslationStats(): {
+  totalUntranslated: number;
+  loggingEnabled: boolean;
+  dictionarySize: number;
+} {
+  return {
+    totalUntranslated: untranslatedErrors.size,
+    loggingEnabled: LOGGING_CONFIG.enabled,
+    dictionarySize: Object.keys(ERROR_TRANSLATIONS).length,
+  };
+}
+
+/**
+ * Clear the untranslated errors log
+ */
+export function clearUntranslatedErrors(): void {
+  untranslatedErrors.clear();
+  logCounter = 0;
+}
+
 const ERROR_TRANSLATIONS: Record<string, string> = {
   // Auth errors
   'Invalid login credentials': 'Email ou senha incorretos',
@@ -145,14 +238,21 @@ export function translateError(message: string): string {
 
   // Generic pattern fallback
   const fallback = applyGenericFallback(message);
-  if (fallback) return fallback;
+  if (fallback) {
+    logUntranslatedError(message, fallback);
+    return fallback;
+  }
 
   // If message looks like English (has common English words), wrap it
   const englishIndicators = /\b(the|is|are|was|were|has|have|not|for|with|this|that|from|your|can|will|should|must|error|failed|invalid|unable|cannot)\b/i;
   if (englishIndicators.test(message)) {
-    return `Erro: ${message}`;
+    const wrappedResult = `Erro: ${message}`;
+    logUntranslatedError(message, wrappedResult);
+    return wrappedResult;
   }
 
   // Return original (likely already in Portuguese)
+  // Still log it so we can confirm it's being handled
+  logUntranslatedError(message, message);
   return message;
 }
