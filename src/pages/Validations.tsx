@@ -110,7 +110,7 @@ export default function Validations() {
           body: { evaluation_id: selectedEval.id, new_status: newStatus, validation_notes: actionNotes || null },
         });
       } catch (notifyErr) {
-        console.error('Notification error:', notifyErr);
+        // Notification error handled silently
       }
       
       setSelectedEval(null);

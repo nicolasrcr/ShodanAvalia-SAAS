@@ -197,16 +197,16 @@ export function CandidateImportDialog({ onImportComplete }: CandidateImportDialo
 
     try {
       const toInsert = parsedCandidates.map((c) => ({
-        full_name: c.full_name,
-        email: c.email || null,
+        full_name: String(c.full_name || '').substring(0, 255).trim() || 'Sem nome',
+        email: c.email ? String(c.email).substring(0, 255).trim() : null,
         birth_date: c.birth_date || '2000-01-01',
-        federation: c.federation || 'Não informada',
-        association: c.association || null,
-        current_grade: c.current_grade || '1º KYÛ',
-        target_grade: c.target_grade || '1º DAN',
-        zempo_registration: c.zempo_registration || null,
-        registration_years: c.registration_years || 0,
-        accumulated_points: c.accumulated_points || 0,
+        federation: String(c.federation || 'Não informada').substring(0, 255).trim(),
+        association: c.association ? String(c.association).substring(0, 255).trim() : null,
+        current_grade: String(c.current_grade || '1º KYÛ').substring(0, 50).trim(),
+        target_grade: String(c.target_grade || '1º DAN').substring(0, 50).trim(),
+        zempo_registration: c.zempo_registration ? String(c.zempo_registration).substring(0, 100).trim() : null,
+        registration_years: Math.max(0, Math.min(100, Number(c.registration_years) || 0)),
+        accumulated_points: Math.max(0, Math.min(100000, Number(c.accumulated_points) || 0)),
       }));
 
       const { error } = await supabase.from('candidates').insert(toInsert);

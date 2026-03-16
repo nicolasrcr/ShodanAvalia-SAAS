@@ -66,7 +66,7 @@ function AppRoutes() {
       <Route path="/new-evaluation" element={<ProtectedRoute><NewEvaluation /></ProtectedRoute>} />
       <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
       <Route path="/programs" element={<ProtectedRoute><Programs /></ProtectedRoute>} />
-      <Route path="/validations" element={<ProtectedRoute><Validations /></ProtectedRoute>} />
+      <Route path="/validations" element={<RoleProtectedRoute requiredRole="admin"><Validations /></RoleProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
