@@ -21,7 +21,16 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'A user with this email address has already been registered': 'Este email já está cadastrado.',
   'Only an admin can modify a user': 'Apenas um administrador pode alterar este usuário.',
   'otp_expired': 'Código de verificação expirado. Solicite um novo.',
+// Store for untranslated errors (in-memory, could be persisted to backend)
+const untranslatedErrors: Set<string> = new Set();
+let logCounter = 0;
 
+// Configure logging (could be extended to send to analytics service)
+const LOGGING_CONFIG = {
+  enabled: true,
+  maxStored: 100,
+  prefix: '[Translation]',
+};
   // Database/RLS errors
   'new row violates row-level security policy': 'Permissão negada. Você não tem autorização para esta ação.',
   'Row level security policy violation': 'Permissão negada. Política de segurança violada.',
