@@ -12,6 +12,46 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+
+    // Role check: admin or moderator only
+    const { data: roleData } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+
+    if (!roleData || !["admin", "moderator"].includes(roleData.role)) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { evaluation_id, new_status, validation_notes } = await req.json();
 
     if (!evaluation_id || !new_status) {
@@ -64,7 +104,7 @@ Deno.serve(async (req) => {
 
     if (recipients.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No recipients found, skipping notification" }),
+        JSON.stringify({ success: true, message: "No recipients found, skipping notification" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -89,19 +129,14 @@ Deno.serve(async (req) => {
 
     console.log("Notification prepared:", JSON.stringify(notification, null, 2));
 
+    // Return success without exposing recipient emails
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Notification prepared for ${recipients.length} recipient(s)`,
-        recipients,
-        subject: notification.subject,
-      }),
+      JSON.stringify({ success: true }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in notify-validation:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
