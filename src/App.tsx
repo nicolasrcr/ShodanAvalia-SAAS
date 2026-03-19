@@ -60,11 +60,11 @@ function AppRoutes() {
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/candidates" element={<ProtectedRoute><Candidates /></ProtectedRoute>} />
+      <Route path="/candidates" element={<RoleProtectedRoute requiredRole="moderator"><Candidates /></RoleProtectedRoute>} />
       <Route path="/evaluations" element={<ProtectedRoute><Evaluations /></ProtectedRoute>} />
       <Route path="/evaluations/:id" element={<ProtectedRoute><EvaluationDetail /></ProtectedRoute>} />
-      <Route path="/new-evaluation" element={<ProtectedRoute><NewEvaluation /></ProtectedRoute>} />
-      <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+      <Route path="/new-evaluation" element={<RoleProtectedRoute requiredRole="moderator"><NewEvaluation /></RoleProtectedRoute>} />
+      <Route path="/history" element={<RoleProtectedRoute requiredRole="moderator"><History /></RoleProtectedRoute>} />
       <Route path="/programs" element={<ProtectedRoute><Programs /></ProtectedRoute>} />
       <Route path="/validations" element={<RoleProtectedRoute requiredRole="admin"><Validations /></RoleProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

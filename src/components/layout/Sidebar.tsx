@@ -14,12 +14,15 @@ import { useRole } from '@/hooks/useRole';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Painel' },
-  { href: '/candidates', icon: Users, label: 'Candidatos' },
   { href: '/evaluations', icon: ClipboardList, label: 'Avaliações' },
-  { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
-  { href: '/history', icon: History, label: 'Histórico' },
   { href: '/programs', icon: BookOpen, label: 'Programas' },
   { href: '/profile', icon: User, label: 'Meu Perfil' },
+];
+
+const moderatorItems = [
+  { href: '/candidates', icon: Users, label: 'Candidatos' },
+  { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
+  { href: '/history', icon: History, label: 'Histórico' },
 ];
 
 const adminItems = [
