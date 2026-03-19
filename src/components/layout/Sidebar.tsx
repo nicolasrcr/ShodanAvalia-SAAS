@@ -14,12 +14,15 @@ import { useRole } from '@/hooks/useRole';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Painel' },
-  { href: '/candidates', icon: Users, label: 'Candidatos' },
   { href: '/evaluations', icon: ClipboardList, label: 'Avaliações' },
-  { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
-  { href: '/history', icon: History, label: 'Histórico' },
   { href: '/programs', icon: BookOpen, label: 'Programas' },
   { href: '/profile', icon: User, label: 'Meu Perfil' },
+];
+
+const moderatorItems = [
+  { href: '/candidates', icon: Users, label: 'Candidatos' },
+  { href: '/new-evaluation', icon: FileText, label: 'Nova Súmula' },
+  { href: '/history', icon: History, label: 'Histórico' },
 ];
 
 const adminItems = [
@@ -28,9 +31,13 @@ const adminItems = [
 
 export function Sidebar() {
   const location = useLocation();
-  const { isAdmin } = useRole();
+  const { isAdmin, isModerator } = useRole();
 
-  const allItems = isAdmin ? [...navItems, ...adminItems] : navItems;
+  const allItems = [
+    ...navItems,
+    ...(isModerator ? moderatorItems : []),
+    ...(isAdmin ? adminItems : []),
+  ];
 
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border min-h-[calc(100vh-73px)]">
