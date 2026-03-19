@@ -31,9 +31,13 @@ const adminItems = [
 
 export function Sidebar() {
   const location = useLocation();
-  const { isAdmin } = useRole();
+  const { isAdmin, isModerator } = useRole();
 
-  const allItems = isAdmin ? [...navItems, ...adminItems] : navItems;
+  const allItems = [
+    ...navItems,
+    ...(isModerator ? moderatorItems : []),
+    ...(isAdmin ? adminItems : []),
+  ];
 
   return (
     <aside className="w-64 bg-sidebar border-r border-sidebar-border min-h-[calc(100vh-73px)]">
