@@ -163,6 +163,11 @@ export default function AuthPage() {
                       <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
                         {isLoading ? 'Entrando...' : 'Entrar'}
                       </Button>
+                      <div className="text-center">
+                        <a href="/forgot-password" className="text-sm text-primary hover:underline">
+                          Esqueceu a senha?
+                        </a>
+                      </div>
                     </form>
                   </TabsContent>
 
