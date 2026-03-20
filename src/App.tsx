@@ -16,6 +16,8 @@ import Programs from "./pages/Programs";
 import Validations from "./pages/Validations";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
